@@ -7,7 +7,7 @@ class SchoolsController{
         const{name} = request.body;
         const {org_id} = request.params;
 
-        console.log(org_id);
+        
         const school_id = await knex("schools").insert({
             name,
             org_id
@@ -17,8 +17,8 @@ class SchoolsController{
     }
 
     async show(request, response){
-        const {id} = request.params;
-        const student = await knex("students").where({school_id:id}).orderBy("name"); 
+        const {org_id} = request.params;
+        const student = await knex("students").where({school_id:org_id}).orderBy("name"); 
 
         return response.json({
             ...student,
