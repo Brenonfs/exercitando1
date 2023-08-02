@@ -11,14 +11,14 @@ class SchoolsController{
         const school_id = await knex("schools").insert({
             name,
             org_id
-        });
+        }).returning("*");
 
-        response.json();
+        response.json(school_id);
     }
 
     async show(request, response){
         const {org_id} = request.params;
-        const student = await knex("students").where({school_id:org_id}).orderBy("name"); 
+        const student = await knex("students").where({school_id:org_id}).orderBy("name").select("name","idade"); 
 
         return response.json({
             ...student,

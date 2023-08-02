@@ -2,35 +2,69 @@ const knex = require('../database/knex');
 
 class OrgsController{
 
-    async create(request, response){   
+    async create(request, response){
         const{name} = request.body;
 
-        await knex("orgs").insert({
+        const org= await knex("orgs").insert({
             name,
-        });
+        }).returning("*");
 
-        response.json(); 
+        response.json(org);
     }
 
     async showschool(request, response){
         const {id} = request.params;
-        const school = await knex("schools").where({org_id:id}).orderBy("name");
+        const school = await knex("schools").where({org_id:id}).orderBy("name").select("name");
 
         return response.json({
             ...school,
-            
+
         });
     }
+
     async showStudents(request, response){
         const {id} = request.params;
-        const student = await knex("students").where({school_id:id}).orderBy("name");
+        const schools = await knex("schools").where("org_id", id).select("id","name")
+        let armazem = [];
 
-        return response.json({
-            student,
-            
-        });
+        for (const school of schools) {
+            const students = await knex("students").where({school_id:school.id}).orderBy("name").select("name");
+            const schoolWithStudents = {
+                school_name: school.name,
+                students: students,
+            };
+            armazem.push(schoolWithStudents);
+            }
+        console.log({armazem})
+        return response.json({armazem});
     }
-    
+
+    //console.log(students);
+
+            // for (const student of students) {
+            //     student.school_name = school.name;
+            // }
+            // armazem = [...students];
+
+
+    // async  showStudents(request, response) {
+    //     const { id } = request.params;
+    //     const schools = await knex("schools").where("org_id", id);
+
+    //     let students = [];
+
+    //     for (const school of schools) {
+    //         const schoolStudents = await knex("students")
+    //             .where("school_id", school.id)
+    //             .select("name");
+
+    //         for (const student of schoolStudents) {
+    //             student.school_name = school.name;
+    //         }
+    //         students = [...students, ...schoolStudents];
+    //     }
+    //     return response.json({ students });
+    // }
 }
 
 module.exports = OrgsController;

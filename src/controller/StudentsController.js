@@ -11,9 +11,9 @@ class StudentsController{
             name,
             idade,
             school_id
-        });
-        
-        response.json();
+        }).returning("*");
+
+        response.json(student_id);
     }
 }
 
